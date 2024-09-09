@@ -8,7 +8,7 @@
 
 #include <dt-bindings/phy/phy-imx8-pcie.h>
 #include <dt-bindings/usb/pd.h>
-#include "imx8mm-lt.dtsi"
+#include "imx8mm.dtsi"
 
 / {
 	chosen {
@@ -86,6 +86,7 @@
 		gpio = <&gpio3 25 GPIO_ACTIVE_HIGH>;
 		enable-active-high;
 	};
+	
 
 	reg_usdhc2_vmmc: regulator-usdhc2 {
 		compatible = "regulator-fixed";
@@ -306,7 +307,7 @@
 	clock-frequency = <100000>;
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_i2c3>;
-	status = "okay";
+	status = "disabled";
 
 	ov5640_mipi: ov5640_mipi@3c {
 		compatible = "ovti,ov5640_mipi";
@@ -340,7 +341,7 @@
 &mipi_csi_1 {
 	#address-cells = <1>;
 	#size-cells = <0>;
-	status = "okay";
+	status = "disabled";
 	port {
 		mipi1_sensor_ep: endpoint@1 {
 			remote-endpoint = <&ov5640_mipi1_ep>;
@@ -363,11 +364,11 @@
 	assigned-clocks = <&clk IMX8MM_CLK_PDM>;
 	assigned-clock-parents = <&clk IMX8MM_AUDIO_PLL1_OUT>;
 	assigned-clock-rates = <196608000>;
-	status = "okay";
+	status = "disabled";
 };
 
 &mipi_dsi {
-       status = "okay";
+       status = "disabled";
 
 };
 
@@ -377,6 +378,7 @@
 	fsl,tx-deemph-gen2 = <0xf>;
 	clocks = <&pcie0_refclk>;
         assigned-clocks = <&pcie0_refclk>;
+	assigned-clock-parents;
         #phy-cells = <0>;
         status = "okay"; /* 启用 PCIe PHY */
 };
@@ -421,17 +423,12 @@
 	status = "okay";
 };
 
-&uart1 { /* BT */
+&uart1 { 
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_uart1>;
 	assigned-clocks = <&clk IMX8MM_CLK_UART1>;
 	assigned-clock-parents = <&clk IMX8MM_SYS_PLL1_80M>;
-	fsl,uart-has-rtscts;
 	status = "okay";
-
-	bluetooth {
-		compatible = "nxp,88w8987-bt";
-	};
 };
 
 &uart2 { /* console */
@@ -445,18 +442,31 @@
 	pinctrl-0 = <&pinctrl_uart3>;
 	assigned-clocks = <&clk IMX8MM_CLK_UART3>;
 	assigned-clock-parents = <&clk IMX8MM_SYS_PLL1_80M>;
-	fsl,uart-has-rtscts;
 	status = "okay";
 };
 
+&uart4 {
+        pinctrl-names = "default";
+        pinctrl-0 = <&pinctrl_uart4>;
+        assigned-clocks = <&clk IMX8MM_CLK_UART4>;
+        assigned-clock-parents = <&clk IMX8MM_SYS_PLL1_80M>;
+        status = "okay";
+};
+
+
+
 &usbotg1 {
 	dr_mode = "host";
+	picophy,pre-emp-curr-control = <3>;
+	picophy,dc-vol-level-adjust = <7>;
 	disable-over-current;
 	status = "okay";
 };
 
 &usbotg2 {
         dr_mode = "host";
+	picophy,pre-emp-curr-control = <3>;
+	picophy,dc-vol-level-adjust = <7>;
         disable-over-current;
         status = "okay";
 };
@@ -732,8 +742,6 @@
 		fsl,pins = <
 			MX8MM_IOMUXC_UART1_RXD_UART1_DCE_RX     0x140
 			MX8MM_IOMUXC_UART1_TXD_UART1_DCE_TX     0x140
-			MX8MM_IOMUXC_UART3_RXD_UART1_DCE_CTS_B  0x140
-			MX8MM_IOMUXC_UART3_TXD_UART1_DCE_RTS_B  0x140
 		>;
 	};
 
@@ -748,10 +756,16 @@
 		fsl,pins = <
 			MX8MM_IOMUXC_ECSPI1_SCLK_UART3_DCE_RX           0x140
 			MX8MM_IOMUXC_ECSPI1_MOSI_UART3_DCE_TX           0x140
-			MX8MM_IOMUXC_ECSPI1_SS0_UART3_DCE_RTS_B         0x140
-			MX8MM_IOMUXC_ECSPI1_MISO_UART3_DCE_CTS_B        0x140
 		>;
 	};
+
+	pinctrl_uart4: uart4grp {
+                fsl,pins = <
+			MX8MM_IOMUXC_UART4_RXD_UART4_DCE_RX     0x140
+                        MX8MM_IOMUXC_UART4_TXD_UART4_DCE_TX     0x140
+                >;
+        };
+
 
 	pinctrl_usdhc1: usdhc1grp {
 		fsl,pins = <
