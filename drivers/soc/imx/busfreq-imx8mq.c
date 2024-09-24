@@ -106,12 +106,14 @@ static void reduce_bus_freq(void)
 
 	high_bus_freq_mode = 0;
 
+	printk(KERN_INFO "reduce_bus_freq ->");
 	/*
 	 * below piece of code has some redundant part, keep
 	 * it at present, we may need update the audio freq
 	 * in the future if needed.
 	 */
 	if (audio_bus_count) {
+		printk(KERN_INFO " audio_bus_count");
 		if (cur_bus_freq_mode == BUS_FREQ_HIGH) {
 			if (bypass_support) {
 				/* prepare the necessary clk before frequency change */
@@ -158,12 +160,15 @@ static void reduce_bus_freq(void)
 		cur_bus_freq_mode = BUS_FREQ_AUDIO;
 	} else {
 		if (cur_bus_freq_mode == BUS_FREQ_HIGH) {
+			printk(KERN_INFO " 111");
 			if (bypass_support) {
+				printk(KERN_INFO "   222");
 				/* prepare the necessary clk before frequency change */
 				clk_prepare_enable(sys1_pll_40m);
 				clk_prepare_enable(dram_alt_root);
 				clk_prepare_enable(sys1_pll_100m);
-
+				
+				printk(KERN_INFO " 223ok");
 				update_bus_freq(low_bus_mode_fsp_index);
 
 				clk_set_parent(dram_alt_src, sys1_pll_100m);
@@ -174,6 +179,7 @@ static void reduce_bus_freq(void)
 				clk_disable_unprepare(sys1_pll_40m);
 				clk_disable_unprepare(dram_alt_root);
 			} else {
+				printk(KERN_INFO "   333");
 				update_bus_freq(low_bus_mode_fsp_index);
 				/*
 				 * the dram_apb and dram_core clk rate is changed
@@ -183,13 +189,15 @@ static void reduce_bus_freq(void)
 				clk_set_rate(dram_apb_pre_div, 160000000);
 				clk_get_rate(dram_pll);
 			}
-
+		       printk(KERN_INFO "   334");	
 			/* change the NOC rate */
-			if (of_machine_is_compatible("fsl,imx8mq"))
+			if (of_machine_is_compatible("fsl,imx8mq")){
+				printk(KERN_INFO "   444");
 				clk_set_rate(noc_div, origin_noc_rate / 8);
-			else
+			}else{
+				printk(KERN_INFO "   555");
 				clk_set_rate(noc_div, origin_noc_rate / 5);
-
+			}
 			rate = clk_get_rate(ahb_div);
 			if (rate == 0) {
 				WARN_ON(1);
@@ -198,6 +206,7 @@ static void reduce_bus_freq(void)
 			clk_set_rate(ahb_div, rate / 6);
 			clk_set_parent(main_axi_src, osc_25m);
 		}
+		printk(KERN_INFO "  777");
 
 		low_bus_freq_mode = 1;
 		audio_bus_freq_mode = 0;
@@ -581,6 +590,7 @@ static int busfreq_probe(struct platform_device *pdev)
 			return -EINVAL;
 
 		fsp_table[i] = res.a0;
+		printk(KERN_INFO "The value of freq is: %lu\n", res.a0);
 	}
 
 	/* get the lowest fsp index */
@@ -589,6 +599,7 @@ static int busfreq_probe(struct platform_device *pdev)
 			break;
 
 	low_bus_mode_fsp_index = i - 1;
+	printk(KERN_INFO "low bus mode fsp index: %i\n", low_bus_mode_fsp_index);
 
 	/*
 	 * if lowest fsp data rate higher than 666mts, then no dll off mode or
@@ -610,7 +621,8 @@ static int busfreq_probe(struct platform_device *pdev)
 	audio_bus_freq_mode = 0;
 	cur_bus_freq_mode = BUS_FREQ_HIGH;
 
-	bus_freq_scaling_is_active = 1;
+	//wlp 禁用busfreq调整
+	bus_freq_scaling_is_active = 0;
 	bus_freq_scaling_initialized = 1;
 
 	INIT_DELAYED_WORK(&low_bus_freq_handler, reduce_bus_freq_handler);

@@ -87,8 +87,16 @@
 		enable-active-high;
 	};
 	
+	reg_ethphy: regulator-ethphy {
+                compatible = "regulator-fixed";
+                regulator-name = "FEC_3V3";
+                regulator-min-microvolt = <3300000>;
+                regulator-max-microvolt = <3300000>;
+        };
 
-	reg_usdhc2_vmmc: regulator-usdhc2 {
+	
+
+	/*reg_usdhc2_vmmc: regulator-usdhc2 {
 		compatible = "regulator-fixed";
 		pinctrl-names = "default";
 		pinctrl-0 = <&pinctrl_reg_usdhc2_vmmc>;
@@ -98,7 +106,7 @@
 		gpio = <&gpio2 19 GPIO_ACTIVE_HIGH>;
 		off-on-delay-us = <20000>;
 		enable-active-high;
-	};
+	};*/
 
 };
 
@@ -120,7 +128,7 @@
 
 &csi1_bridge {
 	fsl,mipi-mode;
-	status = "okay";
+	status = "disabled";
 	port {
 		csi1_ep: endpoint {
 			remote-endpoint = <&csi1_mipi_ep>;
@@ -136,7 +144,7 @@
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_ecspi2 &pinctrl_ecspi2_cs>;
 	cs-gpios = <&gpio5 13 GPIO_ACTIVE_LOW>;
-	status = "okay";
+	status = "disabled";
 
 	spidev0: spi@0 {
 		reg = <0>;
@@ -149,7 +157,9 @@
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_fec1>;
 	phy-mode = "rgmii-id";
+	phy-supply = <&reg_ethphy>;
 	phy-handle = <&ethphy0>;
+	fsl,magic-packet;
 	status = "okay";
 
 	mdio {
@@ -159,16 +169,6 @@
 		ethphy0: ethernet-phy@0 {
 			compatible = "ethernet-phy-ieee802.3-c22";
 			reg = <4>;
-                        at803x,eee-disabled;
-                        at803x,led-act-blind-workaround;
-                        at803x,vddio-1p8v;
-
-			/*vddio-supply = <&vddio>;
-
-			vddio: vddio-regulator {
-				regulator-min-microvolt = <1800000>;
-				regulator-max-microvolt = <1800000>;
-			};*/
 		};
 	};
 };
@@ -426,8 +426,8 @@
 &uart1 { 
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_uart1>;
-	assigned-clocks = <&clk IMX8MM_CLK_UART1>;
-	assigned-clock-parents = <&clk IMX8MM_SYS_PLL1_80M>;
+	//assigned-clocks = <&clk IMX8MM_CLK_UART1>;
+	//assigned-clock-parents = <&clk IMX8MM_SYS_PLL1_80M>;
 	status = "okay";
 };
 
@@ -440,16 +440,16 @@
 &uart3 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_uart3>;
-	assigned-clocks = <&clk IMX8MM_CLK_UART3>;
-	assigned-clock-parents = <&clk IMX8MM_SYS_PLL1_80M>;
+	//assigned-clocks = <&clk IMX8MM_CLK_UART3>;
+	//assigned-clock-parents = <&clk IMX8MM_SYS_PLL1_80M>;
 	status = "okay";
 };
 
 &uart4 {
         pinctrl-names = "default";
         pinctrl-0 = <&pinctrl_uart4>;
-        assigned-clocks = <&clk IMX8MM_CLK_UART4>;
-        assigned-clock-parents = <&clk IMX8MM_SYS_PLL1_80M>;
+        //assigned-clocks = <&clk IMX8MM_CLK_UART4>;
+        //assigned-clock-parents = <&clk IMX8MM_SYS_PLL1_80M>;
         status = "okay";
 };
 
@@ -473,17 +473,18 @@
 
 
 &usdhc2 {
-	assigned-clocks = <&clk IMX8MM_CLK_USDHC2>;
-	assigned-clock-rates = <200000000>;
+	//assigned-clocks = <&clk IMX8MM_CLK_USDHC2>;
+	//assigned-clock-rates = <200000000>;
 	pinctrl-names = "default", "state_100mhz", "state_200mhz";
 	pinctrl-0 = <&pinctrl_usdhc2>, <&pinctrl_usdhc2_gpio>;
 	pinctrl-1 = <&pinctrl_usdhc2_100mhz>, <&pinctrl_usdhc2_gpio>;
 	pinctrl-2 = <&pinctrl_usdhc2_200mhz>, <&pinctrl_usdhc2_gpio>;
-	cd-gpios = <&gpio1 15 GPIO_ACTIVE_LOW>;
+	cd-gpios = <&gpio2 12 GPIO_ACTIVE_LOW>;
 	bus-width = <4>;
-	vmmc-supply = <&reg_usdhc2_vmmc>;
+	//vmmc-supply = <&reg_usdhc2_vmmc>;
 	status = "okay";
 };
+
 
 &vpu_g1 {
 	status = "okay";
@@ -570,6 +571,7 @@
 			MX8MM_IOMUXC_SAI2_RXC_GPIO4_IO22		0x19
 		>;
 	};
+	
 
 	pinctrl_gpio_led: gpioledgrp {
 		fsl,pins = <
@@ -655,11 +657,11 @@
 		>;
 	};
 
-	pinctrl_reg_usdhc2_vmmc: regusdhc2vmmcgrp {
+	/*pinctrl_reg_usdhc2_vmmc: regusdhc2vmmcgrp {
 		fsl,pins = <
 			MX8MM_IOMUXC_SD2_RESET_B_GPIO2_IO19	0x41
 		>;
-	};
+	};*/
 
 	pinctrl_sai1: sai1grp {
 		fsl,pins = <
@@ -802,7 +804,7 @@
 
 	pinctrl_usdhc2_gpio: usdhc2grpgpiogrp {
 		fsl,pins = <
-			MX8MM_IOMUXC_GPIO1_IO15_GPIO1_IO15	0x1c4
+			MX8MM_IOMUXC_SD2_RESET_B_GPIO2_IO19	0x1c4
 		>;
 	};
 

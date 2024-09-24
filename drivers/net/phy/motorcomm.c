@@ -593,6 +593,7 @@ static int yt8511_write_page(struct phy_device *phydev, int page)
 	return __phy_write(phydev, YT8511_PAGE_SELECT, page);
 };
 
+
 static int yt8511_config_init(struct phy_device *phydev)
 {
 	int oldpage, ret = 0;
