@@ -610,7 +610,8 @@ static int busfreq_probe(struct platform_device *pdev)
 	audio_bus_freq_mode = 0;
 	cur_bus_freq_mode = BUS_FREQ_HIGH;
 
-	bus_freq_scaling_is_active = 1;
+	//wlp 禁用busfreq调整
+	bus_freq_scaling_is_active = 0;
 	bus_freq_scaling_initialized = 1;
 
 	INIT_DELAYED_WORK(&low_bus_freq_handler, reduce_bus_freq_handler);

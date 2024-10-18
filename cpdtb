@@ -1,0 +1,1 @@
+scp arch/arm64/boot/dts/freescale/imx8mm-lt-dart.dtb  autani@core:/home/autani

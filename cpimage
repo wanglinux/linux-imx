@@ -1,0 +1,1 @@
+scp arch/arm64/boot/Image  autani@core:/home/autani
